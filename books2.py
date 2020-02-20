@@ -20,7 +20,7 @@ book_scores = { i: int(t) for i, t in enumerate(input().split()) }
 libraries = []
 for library_index in range(libraries_count):
     [ bc, sd, bpd ] = [ int(t) for t in input().split() ]
-    books = [ int(t) for t in input().split() ]
+    books = set([ int(t) for t in input().split() ])
     libraries.append(Library(library_index, bc, sd, bpd, books))
 
 def remove_submitted_books(libraries, books):
@@ -37,7 +37,7 @@ def piporro_points(library, current_day):
 
 
 count_libraries = 0
-result = []
+result = ""
 current_day = 0
 while current_day <= days:
 
@@ -53,15 +53,15 @@ while current_day <= days:
     libraries.remove(library)
 
     n_books = (days - current_day) * library.books_per_day
-    n_books = n_books if n_books <= library.books_count else library.books_count
+    books_count = len(library.books)
+    n_books = n_books if n_books <= books_count else books_count
 
-    sorted_books = sorted(library.books, key=lambda b: book_scores[b], reverse=True)
+    sorted_books = sorted(library.books, key=lambda b: book_scores[b], reverse=True)[:n_books]
 
-    submitted_books = sorted_books[:n_books]
     result += f"{library.id} {n_books}\n"
-    result += ' '.join(map(str, submitted_books)) + "\n"
+    result += ' '.join(map(str, sorted_books)) + "\n"
 
-    remove_submitted_books(libraries, submitted_books)
+    remove_submitted_books(libraries, set(sorted_books))
 
     count_libraries += 1
 
