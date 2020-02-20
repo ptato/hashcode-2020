@@ -37,9 +37,9 @@ def piporro_points(library, current_day):
     return piporro
 
 def ptato_points(l, current_day):
-    bpd = (l.books_per_day * (days - current_day - l.signup_duration)) / (days-current_day)
+    bpd = (l.books_per_day * (days - current_day - l.signup_duration)) / (days-current_day + 1)
     btotal = (l.books_per_day * (days - current_day - l.signup_duration))
-    avg = sum(sorted([ book_scores[b] for b in l.books], reverse=True)[:btotal]) / (days-current_day)
+    avg = sum(sorted([ book_scores[b] for b in l.books], reverse=True)[:btotal]) / (days-current_day + 1)
     return avg * bpd
 
 
@@ -79,9 +79,11 @@ while current_day <= days:
         result += f"{library.id} {n_books}\n"
         result += ' '.join(map(str, sorted_books)) + "\n"
 
-    remove_submitted_books(libraries, set(sorted_books))
+        remove_submitted_books(libraries, set(sorted_books))
 
-    count_libraries += 1
+        count_libraries += 1
+
+
 
 # for library in libraries:
 #     print('', file=sys.stderr)
