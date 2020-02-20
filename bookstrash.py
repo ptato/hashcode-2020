@@ -3,13 +3,12 @@ import sys
 class Library:
     def __init__(self, id, books_count, signup_duration, books_per_day, books):
         self.id = id
-        self.books_count = books_count
         self.signup_duration = signup_duration
         self.books_per_day = books_per_day
         self.books = books
 
-        self.day_starting = 0
-        self.submitted_books = 0
+        self.starts_on_day = 0
+        self.submitted_books = set()
 
 
 [ books_count, libraries_count, days ] = [ int(t) for t in input().split() ]
@@ -22,11 +21,7 @@ for library_index in range(libraries_count):
 
 def remove_submitted_books(libraries, books):
     for l in libraries:
-        for n in books:
-            try:
-                l.books.remove(n)
-            except:
-                pass
+        l.books = l.books - books
 
 def piporro_points(library, current_day):
     n_books = (days - current_day) * library.books_per_day
@@ -35,15 +30,12 @@ def piporro_points(library, current_day):
     piporro = sum(sorted(library.books, key=lambda b: book_scores[b], reverse=True)[:n_books])
     return piporro
 
-from collections import defaultdict
-amounts_of_books = defaultdict(int)
-for library in libraries:
-    for b in library.books:
-        amounts_of_books[b] += 1
 
+submitting_with_libraries = [ ]
+
+result = dict()
 
 count_libraries = 0
-result = ""
 current_day = 0
 while current_day <= days:
 
@@ -58,24 +50,28 @@ while current_day <= days:
 
     libraries.remove(library)
 
-    n_books = (days - current_day) * library.books_per_day
-    books_count = len(library.books)
-    n_books = n_books if n_books <= books_count else books_count
+    submitted_books = set()
+    for swli, swl in enumerate(submitting_with_libraries):
+        n_books = swl.books_per_day * library.signup_duration
+        if n_books > len(swl.books): n_books = len(swl.books)
+        sorted_books = set(sorted(swl.books, key=lambda b: book_scores[b], reverse=True)[:n_books])
+        submitted_books = submitted_books.union(sorted_books)
+        remove_submitted_books(submitting_with_libraries[:swli+1], submitted_books)
+        swl.submitted_books = swl.submitted_books.union(sorted_books)
 
-    # sorted_books = sorted(library.books, key=lambda b: book_scores[b], reverse=True)[:n_books]
-    sorted_books = sorted(library.books, key=lambda b: book_scores[b] / amounts_of_books[b])[:n_books]
+    library.starts_on_day = current_day - library.signup_duration
+    submitting_with_libraries.append(library)
 
-    result += f"{library.id} {n_books}\n"
-    result += ' '.join(map(str, sorted_books)) + "\n"
+    result[library.id] = library
 
-    remove_submitted_books(libraries, set(sorted_books))
+    remove_submitted_books(libraries, set(submitted_books))
 
     count_libraries += 1
 
-# for library in libraries:
-#     print('', file=sys.stderr)
-#     print(' '.join(map(str, library.books)), file=sys.stderr)
-
-print(count_libraries)
-print(result)
+result = { k:v for k, v in result.items() if len(v.submitted_books) > 0 }
+print(len(result))
+for id, library in result.items():
+    if len(library.submitted_books) > 0:
+        print(f'{id} {len(library.submitted_books)}')
+        print(' '.join(map(str, library.submitted_books)))
 
