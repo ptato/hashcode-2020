@@ -43,12 +43,11 @@ for library in libraries:
 
 
 count_libraries = 0
-result = ""
 current_day = 0
 while current_day <= days:
 
     try:
-        library = sorted(libraries, key=lambda l: l.signup_duration)[0]
+        library = [ t for t in sorted(libraries, key=lambda l: l.signup_duration) if len(t.books) > 0 ][0]
     except:
         break
 
