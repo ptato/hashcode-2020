@@ -48,7 +48,7 @@ current_day = 0
 while current_day <= days:
 
     try:
-        library = sorted(libraries, key=lambda l: piporro_points(l, current_day), reverse=True)[0]
+        library = sorted(libraries, key=lambda l: l.signup_duration)[0]
     except:
         break
 
@@ -62,8 +62,8 @@ while current_day <= days:
     books_count = len(library.books)
     n_books = n_books if n_books <= books_count else books_count
 
-    # sorted_books = sorted(library.books, key=lambda b: book_scores[b], reverse=True)[:n_books]
-    sorted_books = sorted(library.books, key=lambda b: book_scores[b] / amounts_of_books[b])[:n_books]
+    sorted_books = sorted(library.books, key=lambda b: book_scores[b], reverse=True)[:n_books]
+    # sorted_books = sorted(library.books, key=lambda b: book_scores[b] / amounts_of_books[b], reverse=True)[:n_books]
 
     result += f"{library.id} {n_books}\n"
     result += ' '.join(map(str, sorted_books)) + "\n"
